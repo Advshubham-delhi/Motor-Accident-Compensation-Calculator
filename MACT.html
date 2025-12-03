@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Motor Accident Compensation Calculator MACT</title>
+
+<style>
+/* Import font */
+@import url('https://fonts.googleapis.com/css2?family=Bree+Serif&display=swap');
+
+/* Global styles */
+body {
+  font-family: 'Bree Serif', serif;
+  background-color: #f4fefd;
+  color: #043434;
+  margin: 0;
+  padding: 0px;
+}
+
+/* Header */
+.header-content {
+  text-align: center;
+  margin-bottom: 10px;
+}
+a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+a:hover {
+    color: #0077b5;
+    text-decoration: underline;
+}
+
+.header-content .logo {
+  width: 200px;
+  margin-bottom: -40px;
+}
+
+.title-section h1 {
+  font-size: 28px;
+  margin: 0;
+}
+
+.title-section p {
+  margin: 5px 0 0;
+  font-size: 14px;
+}
+
+.diac-box p {
+  text-align: center;
+  margin: 5px 0 0;
+  font-size: 14px;
+}
+
+/* Container */
+.container {
+  max-width: 700px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* Input groups */
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.input-group input,
+.input-group select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  border-color: #004d40;
+  box-shadow: 0 0 5px rgba(0,77,64,0.3);
+}
+
+/* Button */
+button {
+  background-color: #043434;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+  width: 100%;
+}
+
+button:hover {
+  background-color: #00796b;
+}
+
+/* Results box */
+.result-box {
+  margin-top: 25px;
+  padding: 20px;
+  border-radius: 10px;
+  background: #e6f9f7;
+  border: 1px solid #b2dfdb;
+  display: none;
+}
+
+.result-box h3 {
+  margin-top: 0;
+  color: #004d40;
+}
+
+/* small table */
+.breakdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+.breakdown-table td, .breakdown-table th {
+  padding: 8px;
+  border: 1px solid #d0e9e6;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 15px;
+  background-color: #043434;
+  color: white;
+  margin-top: 40px;
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 760px) {
+  .container { padding: 15px; margin: 10px; }
+  .header-content .logo { width: 150px; }
+}
+
+/* Print watermark */
+@media print {
+  body::before {
+    content: "FS & Partners";
+    position: fixed;
+    top: 40%;
+    left: 20%;
+    font-size: 80px;
+    opacity: 0.08;
+    transform: rotate(-30deg);
+    color: #043434;
+  }
+  button, select, input { display: none !important; }
+}
+</style>
+</head>
+<body>
+<div class="header-content">
+  <a href="https://www.linkedin.com/company/fs-partners-advocates/" target="_blank">
+    <img src="logo.png" alt="FS & Partners Logo" class="logo">
+  </a>
+  <h2><center>Motor Accident Compensation Calculator</center></h2>
+</div>
+
+<div class="container">
+
+  <div class="input-group">
+    <label>Type of Case</label>
+    <select id="caseType" onchange="toggleCaseType()">
+      <option value="">Select</option>
+      <option value="death">Death Case</option>
+      <option value="injury">Injury Case</option>
+    </select>
+  </div>
+
+  <!-- DEATH SECTION -->
+  <div id="deathSection" style="display:none;">
+
+    <div class="input-group">
+      <label>Age of Deceased</label>
+      <input type="number" id="age" min="0" placeholder="Enter age" oninput="handleAgeInputs()">
+    </div>
+
+    <div class="input-group">
+      <label>Monthly Income (₹) — <small>(will be auto-filled & disabled if age &lt; 18)</small></label>
+      <input type="number" id="monthlyIncome" placeholder="Monthly income" min="0" step="1" oninput="clearMinorFlagIfNeeded('death')">
+    </div>
+
+    <div class="input-group">
+      <label>Number of Dependents (for personal deduction)</label>
+      <input type="number" id="dependents" min="0" value="1">
+    </div>
+
+    <div class="input-group">
+      <label>Funeral Expenses (₹)</label>
+      <input type="number" id="funeral" value="15000" min="0">
+    </div>
+
+    <div class="input-group">
+      <label>Loss of Estate (₹)</label>
+      <input type="number" id="estate" value="15000" min="0">
+    </div>
+
+    <div class="input-group">
+      <label>Medical Expenses (₹)</label>
+      <input type="number" id="medical" value="0" min="0">
+    </div>
+
+  </div>
+
+  <!-- INJURY SECTION -->
+  <div id="injurySection" style="display:none;">
+
+    <div class="input-group">
+      <label>Age of Victim</label>
+      <input type="number" id="ageInjury" min="0" placeholder="Enter age" oninput="handleAgeInputs()">
+    </div>
+
+    <div class="input-group">
+      <label>Monthly Income (₹) — <small>(will be auto-filled & disabled if age &lt; 18)</small></label>
+      <input type="number" id="incomeInjury" placeholder="Monthly income" min="0" step="1" oninput="clearMinorFlagIfNeeded('injury')">
+    </div>
+
+    <div class="input-group">
+      <label>Injury Type (Step 1)</label>
+      <select id="injuryMode" onchange="toggleInjuryMode()">
+        <option value="">Select</option>
+        <option value="temporary">Temporary Disability</option>
+        <option value="permanent_partial">Permanent Partial Disability</option>
+        <option value="permanent_total">Permanent Total Disability</option>
+      </select>
+    </div>
+
+    <!-- TEMPORARY FIELDS -->
+    <div id="temporaryFields" style="display:none;">
+      <div class="input-group">
+        <label>Loss of Income During Treatment (₹)</label>
+        <input type="number" id="lossDuringTreatment" value="0" min="0">
+      </div>
+      <div class="input-group">
+        <label>Medical Expenses (₹)</label>
+        <input type="number" id="medicalTemp" value="0" min="0">
+      </div>
+      <div class="input-group">
+        <label>Pain & Suffering (₹)</label>
+        <input type="number" id="painTemp" value="25000" min="0">
+      </div>
+      <div class="input-group">
+        <label>Special Diet (₹)</label>
+        <input type="number" id="dietTemp" value="0" min="0">
+      </div>
+      <div class="input-group">
+        <label>Conveyance (₹)</label>
+        <input type="number" id="conveyanceTemp" value="0" min="0">
+      </div>
+      <div class="input-group">
+        <label>Attendant Charges (₹)</label>
+        <input type="number" id="attendantTemp" value="0" min="0">
+      </div>
+      <div class="input-group">
+        <label>Future Medical Expenses (₹)</label>
+        <input type="number" id="futureMedTemp" value="0" min="0">
+      </div>
+    </div>
+
+    <!-- PERMANENT FIELDS -->
+    <div id="permanentFields" style="display:none;">
+      <div class="input-group">
+        <label>Percentage Disability (%)</label>
+        <input type="number" id="disabilityPercent" min="0" max="100" placeholder="0 - 100">
+      </div>
+
+      <div class="input-group">
+        <label>Medical Expenses (₹)</label>
+        <input type="number" id="medicalPerm" value="0" min="0">
+      </div>
+
+      <div class="input-group">
+        <label>Pain & Suffering (₹)</label>
+        <input type="number" id="painPerm" value="50000" min="0">
+      </div>
+
+      <div class="input-group">
+        <label>Loss of Amenities (₹)</label>
+        <input type="number" id="lossAmenities" value="25000" min="0">
+      </div>
+
+      <div class="input-group">
+        <label>Special Diet (₹)</label>
+        <input type="number" id="dietPerm" value="0" min="0">
+      </div>
+
+      <div class="input-group">
+        <label>Conveyance (₹)</label>
+        <input type="number" id="conveyancePerm" value="0" min="0">
+      </div>
+
+      <div class="input-group">
+        <label>Attendant Charges (₹)</label>
+        <input type="number" id="attendantPerm" value="20000" min="0">
+      </div>
+
+      <div class="input-group">
+        <label>Future Medical Expenses (₹)</label>
+        <input type="number" id="futureMedPerm" value="0" min="0">
+      </div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:15px;">
+    <button onclick="calculateCompensation()">Calculate Compensation</button>
+  </div>
+
+  <div id="output" class="result-box"></div>
+
+  <div style="margin-top:15px;">
+    <button onclick="window.print()" style="width:48%; display:inline-block; margin-right:4%;">Print / Save as PDF</button>
+      </div>
+
+</div>
+
+<footer>
+*This calculator provides indicative estimates based on leading precedents (Sarla Verma, Pranay Sethi, Kurvan Ansari, Magma). <br> Courts exercise discretion; results may vary.*
+</footer>
+
+<script>
+// ---------- Utility & Rules ----------
+
+// Multiplier Table (Sarla Verma - adults)
+function getMultiplier(age) {
+    if (age <= 15) return 20;
+    if (age <= 20) return 18;
+    if (age <= 25) return 18;
+    if (age <= 30) return 17;
+    if (age <= 35) return 16;
+    if (age <= 40) return 15;
+    if (age <= 45) return 14;
+    if (age <= 50) return 13;
+    if (age <= 55) return 11;
+    if (age <= 60) return 9;
+    if (age <= 65) return 7;
+    return 5;
+}
+
+// Future Prospects % (Pranay Sethi) - returns decimal
+function getFutureProspects(age) {
+    if (age < 18) return 0;
+    if (age <= 40) return 0.40;
+    if (age <= 50) return 0.25;
+    if (age <= 60) return 0.10;
+    return 0;
+}
+
+// Personal Expenses deduction (Sarla Verma) - returns decimal
+function getPersonalExpenses(dep) {
+    if (dep <= 1) return 0.50;
+    if (dep == 2) return 0.33;
+    return 0.25;
+}
+
+// Toggle Death / Injury
+function toggleCaseType() {
+    let type = document.getElementById("caseType").value;
+    document.getElementById("deathSection").style.display = type === "death" ? "block" : "none";
+    document.getElementById("injurySection").style.display = type === "injury" ? "block" : "none";
+
+    // clear output when switching
+    hideOutput();
+}
+
+// Toggle Injury Mode (Option B two-step)
+function toggleInjuryMode() {
+    let mode = document.getElementById("injuryMode").value;
+    document.getElementById("temporaryFields").style.display = mode === "temporary" ? "block" : "none";
+    document.getElementById("permanentFields").style.display = (mode === "permanent_partial" || mode === "permanent_total") ? "block" : "none";
+    hideOutput();
+}
+
+// Minor auto-detection and auto-fill income
+function handleAgeInputs() {
+    // death age
+    let ageDeathEl = document.getElementById("age");
+    let monthlyIncomeEl = document.getElementById("monthlyIncome");
+    if (ageDeathEl && monthlyIncomeEl) {
+        let ageVal = parseInt(ageDeathEl.value);
+        if (!isNaN(ageVal) && ageVal < 18) {
+            // Minor rules: ₹45,000 p.a -> ₹3,750 / month ; multiplier 20 ; no FP ; deduction 1/3
+            monthlyIncomeEl.value = 3750;
+            monthlyIncomeEl.disabled = true;
+        } else {
+            if (monthlyIncomeEl.disabled) {
+                monthlyIncomeEl.value = "";
+                monthlyIncomeEl.disabled = false;
+            }
+        }
+    }
+
+    // injury age
+    let ageInjuryEl = document.getElementById("ageInjury");
+    let incomeInjuryEl = document.getElementById("incomeInjury");
+    if (ageInjuryEl && incomeInjuryEl) {
+        let ageVal2 = parseInt(ageInjuryEl.value);
+        if (!isNaN(ageVal2) && ageVal2 < 18) {
+            incomeInjuryEl.value = 3750;
+            incomeInjuryEl.disabled = true;
+        } else {
+            if (incomeInjuryEl.disabled) {
+                incomeInjuryEl.value = "";
+                incomeInjuryEl.disabled = false;
+            }
+        }
+    }
+    hideOutput();
+}
+
+// If user types into income, clear disabled minor autofill if inconsistent
+function clearMinorFlagIfNeeded(section) {
+    if (section === 'death') {
+        let ageVal = parseInt(document.getElementById("age").value);
+        if (!isNaN(ageVal) && ageVal < 18) {
+            // keep disabled
+            document.getElementById("monthlyIncome").disabled = true;
+            document.getElementById("monthlyIncome").value = 3750;
+        }
+    } else if (section === 'injury') {
+        let ageVal = parseInt(document.getElementById("ageInjury").value);
+        if (!isNaN(ageVal) && ageVal < 18) {
+            document.getElementById("incomeInjury").disabled = true;
+            document.getElementById("incomeInjury").value = 3750;
+        }
+    }
+}
+
+// Hide output helper
+function hideOutput() {
+    document.getElementById("output").style.display = 'none';
+    document.getElementById("output").innerHTML = '';
+}
+
+// ---------- Main Calculation ----------
+
+function calculateCompensation() {
+    hideOutput();
+
+    let caseType = document.getElementById("caseType").value;
+    if (!caseType) {
+        alert("Please select Type of Case (Death or Injury).");
+        return;
+    }
+
+    if (caseType === 'death') {
+        calculateDeath();
+    } else {
+        calculateInjury();
+    }
+}
+
+// Death case calculation
+function calculateDeath() {
+    let ageEl = document.getElementById("age");
+    let monthlyIncomeEl = document.getElementById("monthlyIncome");
+    let dependentsEl = document.getElementById("dependents");
+    let funeral = parseFloat(document.getElementById("funeral").value || 0);
+    let estate = parseFloat(document.getElementById("estate").value || 0);
+    let medical = parseFloat(document.getElementById("medical").value || 0);
+
+    let age = parseInt(ageEl.value);
+    if (isNaN(age)) { alert("Please enter age of deceased."); return; }
+
+    let isMinor = age < 18;
+
+    let annualIncome, multiplier, fpRate, deductionRate;
+
+    if (isMinor) {
+        // Minor: use ₹45,000 p.a and multiplier 20
+        annualIncome = 45000;
+        multiplier = 20;
+        fpRate = 0;
+        deductionRate = 1/3; // minors - 1/3 deduction as per your selected rule
+    } else {
+        // Adult: require monthlyIncome
+        let monthly = parseFloat(monthlyIncomeEl.value);
+        if (isNaN(monthly) || monthly <= 0) { alert("Please enter valid monthly income for adult deceased."); return; }
+        annualIncome = monthly * 12;
+        multiplier = getMultiplier(age);
+        fpRate = getFutureProspects(age);
+        // Use personal expenses based on dependents
+        let dependents = parseInt(dependentsEl.value || 0);
+        deductionRate = getPersonalExpenses(dependents);
+    }
+
+    // Compute income after future prospects and deduction
+    let incomeAfterFP = annualIncome * (1 + fpRate);
+    let incomeAfterDeduction = incomeAfterFP * (1 - deductionRate);
+
+    let lossOfDependency = incomeAfterDeduction * multiplier;
+
+    // Consortium: ₹40,000 × dependents (this was user's rule)
+    let dependents = parseInt(dependentsEl.value || 0);
+    let consortium = dependents * 40000;
+
+    // Conventional heads
+    let conventional = funeral + estate + consortium + medical;
+
+    let total = lossOfDependency + conventional;
+
+    // Show breakdown
+    const out = document.getElementById("output");
+    out.style.display = 'block';
+    out.innerHTML = `
+      <h3>Death Case - Estimate</h3>
+      <table class="breakdown-table">
+        <tr><td>Age</td><td>${age}${isMinor ? " (Minor rules applied)" : ""}</td></tr>
+        <tr><td>Annual Income used</td><td>₹${annualIncome.toLocaleString('en-IN')}</td></tr>
+        <tr><td>Future Prospects</td><td>${(fpRate*100).toFixed(0)}%</td></tr>
+        <tr><td>Personal Expenses Deduction</td><td>${(deductionRate*100).toFixed(2)}%</td></tr>
+        <tr><td>Multiplier</td><td>${multiplier}</td></tr>
+        <tr><td><b>Loss of Dependency</b></td><td>₹${Math.round(lossOfDependency).toLocaleString('en-IN')}</td></tr>
+        <tr><td>Funeral Expenses</td><td>₹${funeral.toLocaleString('en-IN')}</td></tr>
+        <tr><td>Loss of Estate</td><td>₹${estate.toLocaleString('en-IN')}</td></tr>
+        <tr><td>Consortium (₹40,000 × ${dependents})</td><td>₹${consortium.toLocaleString('en-IN')}</td></tr>
+        <tr><td>Medical Expenses</td><td>₹${medical.toLocaleString('en-IN')}</td></tr>
+        <tr><th>Total Compensation (Estimate)</th><th>₹${Math.round(total).toLocaleString('en-IN')}</th></tr>
+      </table>
+      <p style="margin-top:8px;"><small>Note: This is an indicative calculation. Courts may vary awards based on evidence and facts.</small></p>
+    `;
+}
+
+// Injury case calculation (includes all heads)
+function calculateInjury() {
+    let age = parseInt(document.getElementById("ageInjury").value);
+    if (isNaN(age)) { alert("Please enter age of victim (injury case)."); return; }
+
+    let isMinor = age < 18;
+    let monthlyIncome = parseFloat(document.getElementById("incomeInjury").value || 0);
+
+    if (!isMinor && (isNaN(monthlyIncome) || monthlyIncome <= 0)) {
+        alert("Please enter valid monthly income for adult victim.");
+        return;
+    }
+
+    // determine base annual income & other params
+    let annualIncome, multiplier, fpRate, deductionRate;
+    if (isMinor) {
+        annualIncome = 45000; // ₹45,000 p.a.
+        multiplier = 20;
+        fpRate = 0;
+        deductionRate = 1/3;
+    } else {
+        annualIncome = monthlyIncome * 12;
+        multiplier = getMultiplier(age);
+        fpRate = getFutureProspects(age);
+        // For personal expenses deduction use dependents? Injury form doesn't have dependents; use standard 1/3 for simplicity
+        deductionRate = 1/3;
+    }
+
+    // which injury mode
+    const mode = document.getElementById("injuryMode").value;
+    if (!mode) { alert("Please select Injury Type (Temporary / Permanent Partial / Permanent Total)."); return; }
+
+    // Prepare result components
+    let lossDuringTreatment = 0;
+    let medical = 0;
+    let pain = 0;
+    let diet = 0;
+    let conveyance = 0;
+    let attendant = 0;
+    let futureMedical = 0;
+    let lossOfFutureEarning = 0;
+
+    if (mode === 'temporary') {
+        lossDuringTreatment = parseFloat(document.getElementById("lossDuringTreatment").value || 0);
+        medical = parseFloat(document.getElementById("medicalTemp").value || 0);
+        pain = parseFloat(document.getElementById("painTemp").value || 0);
+        diet = parseFloat(document.getElementById("dietTemp").value || 0);
+        conveyance = parseFloat(document.getElementById("conveyanceTemp").value || 0);
+        attendant = parseFloat(document.getElementById("attendantTemp").value || 0);
+        futureMedical = parseFloat(document.getElementById("futureMedTemp").value || 0);
+
+        // Total for temporary = direct heads + lossDuringTreatment
+        let total = lossDuringTreatment + medical + pain + diet + conveyance + attendant + futureMedical;
+
+        const out = document.getElementById("output");
+        out.style.display = 'block';
+        out.innerHTML = `
+          <h3>Injury Case - Temporary Disability (Estimate)</h3>
+          <table class="breakdown-table">
+            <tr><td>Age</td><td>${age}${isMinor ? " (Minor rules applied)" : ""}</td></tr>
+            <tr><td>Loss of Income During Treatment</td><td>₹${lossDuringTreatment.toLocaleString('en-IN')}</td></tr>
+            <tr><td>Medical Expenses</td><td>₹${medical.toLocaleString('en-IN')}</td></tr>
+            <tr><td>Pain & Suffering</td><td>₹${pain.toLocaleString('en-IN')}</td></tr>
+            <tr><td>Special Diet</td><td>₹${diet.toLocaleString('en-IN')}</td></tr>
+            <tr><td>Conveyance</td><td>₹${conveyance.toLocaleString('en-IN')}</td></tr>
+            <tr><td>Attendant Charges</td><td>₹${attendant.toLocaleString('en-IN')}</td></tr>
+            <tr><td>Future Medical Expenses</td><td>₹${futureMedical.toLocaleString('en-IN')}</td></tr>
+            <tr><th>Total Compensation (Estimate)</th><th>₹${Math.round(total).toLocaleString('en-IN')}</th></tr>
+          </table>
+          <p style="margin-top:8px;"><small>Note: Temporary disability awards are fact-specific and usually smaller than permanent disability awards.</small></p>
+        `;
+        return;
+    }
+
+    // Permanent cases (partial or total)
+    if (mode === 'permanent_partial' || mode === 'permanent_total') {
+        let disabilityPercent = 100;
+        if (mode === 'permanent_partial') {
+            disabilityPercent = parseFloat(document.getElementById("disabilityPercent").value || 0);
+            if (isNaN(disabilityPercent) || disabilityPercent <= 0) { alert("Please enter Percentage Disability for permanent partial case."); return; }
+        }
+
+        // collect heads
+        medical = parseFloat(document.getElementById("medicalPerm").value || 0);
+        pain = parseFloat(document.getElementById("painPerm").value || 0);
+        diet = parseFloat(document.getElementById("dietPerm").value || 0);
+        conveyance = parseFloat(document.getElementById("conveyancePerm").value || 0);
+        attendant = parseFloat(document.getElementById("attendantPerm").value || 0);
+        futureMedical = parseFloat(document.getElementById("futureMedPerm").value || 0);
+        let lossAmenities = parseFloat(document.getElementById("lossAmenities").value || 0);
+
+        // compute loss of future earning:
+        // step1: apply future prospects (if any)
+        let incomeAfterFP = annualIncome * (1 + fpRate);
+        // step2: deduct personal expenses
+        let incomeAfterDeduction = incomeAfterFP * (1 - deductionRate);
+        // step3: apply multiplier and disability%
+        if (mode === 'permanent_total') {
+            lossOfFutureEarning = incomeAfterDeduction * multiplier;
+        } else {
+            lossOfFutureEarning = incomeAfterDeduction * multiplier * (disabilityPercent / 100);
+        }
+
+        // total
+        let total = lossOfFutureEarning + medical + pain + diet + conveyance + attendant + futureMedical + lossAmenities;
+
+        const out = document.getElementById("output");
+        out.style.display = 'block';
+        out.innerHTML = `
+          <h3>Injury Case - ${mode === 'permanent_total' ? 'Permanent Total' : 'Permanent Partial'} Disability (Estimate)</h3>
+          <table class="breakdown-table">
+            <tr><td>Age</td><td>${age}${isMinor ? " (Minor rules applied)" : ""}</td></tr>
+            <tr><td>Annual Income used</td><td>₹${annualIncome.toLocaleString('en-IN')}</td></tr>
+            <tr><td>Future Prospects</td><td>${(fpRate*100).toFixed(0)}%</td></tr>
+            <tr><td>Personal Expenses Deduction</td><td>${(deductionRate*100).toFixed(2)}%</td></tr>
+            <tr><td>Multiplier</td><td>${multiplier}</td></tr>
+            ${ mode === 'permanent_partial' ? `<tr><td>Disability (%)</td><td>${disabilityPercent}%</td></tr>` : '' }
+            <tr><td><b>Loss of Future Earning</b></td><td>₹${Math.round(lossOfFutureEarning).toLocaleString('en-IN')}</td></tr>
+            <tr><td>Medical Expenses</td><td>₹${medical.toLocaleString('en-IN')}</td></tr>
+            <tr><td>Pain & Suffering</td><td>₹${pain.toLocaleString('en-IN')}</td></tr>
+            <tr><td>Loss of Amenities</td><td>₹${lossAmenities.toLocaleString('en-IN')}</td></tr>
+            <tr><td>Special Diet</td><td>₹${diet.toLocaleString('en-IN')}</td></tr>
+            <tr><td>Conveyance</td><td>₹${conveyance.toLocaleString('en-IN')}</td></tr>
+            <tr><td>Attendant Charges</td><td>₹${attendant.toLocaleString('en-IN')}</td></tr>
+            <tr><td>Future Medical Expenses</td><td>₹${futureMedical.toLocaleString('en-IN')}</td></tr>
+            <tr><th>Total Compensation (Estimate)</th><th>₹${Math.round(total).toLocaleString('en-IN')}</th></tr>
+          </table>
+          <p style="margin-top:8px;"><small>Note: This is an indicative estimate. Actual awards depend on medical proof, evidence, and court discretion.</small></p>
+        `;
+        return;
+    }
+
+    alert("Unknown injury mode selected.");
+}
+
+// Initialize listeners to auto-handle ages on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // attach inputs already present
+    const ageEl = document.getElementById('age');
+    const ageInjuryEl = document.getElementById('ageInjury');
+    if (ageEl) ageEl.addEventListener('input', handleAgeInputs);
+    if (ageInjuryEl) ageInjuryEl.addEventListener('input', handleAgeInputs);
+});
+</script>
+
+</body>
+</html>
